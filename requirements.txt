@@ -1,5 +1,7 @@
-crewai>=0.86
-litellm
-feedparser
-python-dotenv
-truststore
+crewai[google-genai]==1.14.6
+litellm==1.88.1
+feedparser==6.0.12
+python-dotenv==1.2.2
+truststore==0.10.4
+markdown==3.10.2
+requests==2.34.2

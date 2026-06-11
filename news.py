@@ -26,11 +26,11 @@ def _strip_html(text: str) -> str:
     return re.sub(r"\s+", " ", unescape(text)).strip()
 
 
-def fetch_elephant_news(limit: int = 12):
+def fetch_news(feeds, limit: int = 12):
     """Return a list of recent news items as dicts: title, link, summary, published."""
     seen = set()
     items = []
-    for url in FEEDS:
+    for url in feeds:
         feed = feedparser.parse(url)
         for entry in feed.entries:
             title = entry.get("title", "").strip()
@@ -48,6 +48,11 @@ def fetch_elephant_news(limit: int = 12):
                 }
             )
     return items[:limit]
+
+
+def fetch_elephant_news(limit: int = 12):
+    """Elephant-news shortcut, kept for simple_draft.py."""
+    return fetch_news(FEEDS, limit)
 
 
 if __name__ == "__main__":
