@@ -1,4 +1,4 @@
-crewai>=0.86
+crewai[google-genai]>=0.86
 litellm
 feedparser
 python-dotenv

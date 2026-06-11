@@ -20,6 +20,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, Process, LLM
+import crewai.llms.cache as _llm_cache
+
+# crewai 1.14.6 leaks its internal "cache_breakpoint" message marker through the
+# litellm path, and Groq's API rejects messages with unknown properties. Disable
+# the marker (Gemini caches implicitly, so nothing is lost).
+_llm_cache.mark_cache_breakpoint = lambda message: dict(message)
 
 from news import fetch_elephant_news
 
