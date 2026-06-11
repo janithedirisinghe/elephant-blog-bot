@@ -1,0 +1,50 @@
+name: Draft articles
+
+# Runs the article bot on a schedule, plus a manual "Run workflow" button.
+on:
+  schedule:
+    # 01:00 UTC = 06:30 Sri Lanka time, every 4th day of the month.
+    # Note: day-of-month resets on the 1st, so the gap across a month
+    # boundary can be 1-3 days rather than exactly 4. Good enough for a blog.
+    - cron: "0 1 */4 * *"
+  workflow_dispatch: {}
+
+# Don't let two scheduled runs overlap.
+concurrency:
+  group: draft-articles
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the bot
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOG_API_URL: ${{ secrets.BLOG_API_URL }}
+          BOT_API_KEY: ${{ secrets.BOT_API_KEY }}
+          # Optional: set these as repo Variables (not Secrets) if you want to
+          # override them; they fall back to sensible defaults when empty.
+          BOT_ENABLED: ${{ vars.BOT_ENABLED || 'true' }}
+          QUALITY_MODEL: ${{ vars.QUALITY_MODEL || 'gemini/gemini-2.5-flash' }}
+        run: python crew.py
+
+      - name: Upload drafts as an artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drafts
+          path: output/*.md
+          if-no-files-found: ignore
