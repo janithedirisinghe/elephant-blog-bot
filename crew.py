@@ -34,6 +34,7 @@ _llm_cache.mark_cache_breakpoint = lambda message: dict(message)
 
 from domains import DOMAINS
 from news import fetch_news
+from publish import send_draft
 
 load_dotenv()
 
@@ -132,9 +133,13 @@ def build_crew(news_digest: str, domain: dict) -> Crew:
     )
     review = Task(
         description="Polish the draft for clarity and flow. Make sure every factual claim is "
-        "consistent with the source news digest. At the very top, add an SEO-friendly title and a "
-        "meta description of about 150 characters.",
-        expected_output="The final, publish-ready blog post in Markdown with title and meta description.",
+        "consistent with the source news digest.\n"
+        "Return the result in EXACTLY this format (no code fences, no extra labels):\n"
+        "TITLE: <SEO-friendly title>\n"
+        "META: <meta description of about 150 characters>\n"
+        "\n"
+        "<the full blog post in Markdown, starting with the # H1 line>",
+        expected_output="TITLE: and META: lines, a blank line, then the publish-ready post in Markdown.",
         agent=reviewer,
         context=[draft],
     )
@@ -174,6 +179,12 @@ def run_domain(domain: dict) -> Path | None:
     fname = out_dir / f"draft-{domain['slug']}-{datetime.now():%Y%m%d-%H%M}.md"
     fname.write_text(str(result), encoding="utf-8")
     print(f"\nDraft saved to {fname}")
+
+    if os.getenv("BLOG_API_URL"):
+        try:
+            send_draft(fname, domain)
+        except Exception as e:  # a publish hiccup must not fail the whole run
+            print(f"Could not send draft to blog API: {e}")
     return fname
 
 

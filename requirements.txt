@@ -3,3 +3,5 @@ litellm
 feedparser
 python-dotenv
 truststore
+markdown
+requests

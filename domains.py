@@ -23,6 +23,8 @@ DOMAINS = [
     {
         "slug": "elephants",
         "site": "a Sri Lankan elephant conservation and tourism blog",
+        "category": "Wildlife",
+        "tags": ["elephants", "sri lanka", "conservation"],
         "feeds": ELEPHANT_FEEDS,
         "panel": [
             {
@@ -42,6 +44,8 @@ DOMAINS = [
     {
         "slug": "tourism",
         "site": "a Sri Lankan travel and destinations blog",
+        "category": "Travel",
+        "tags": ["sri lanka", "travel", "destinations"],
         "feeds": [
             "https://news.google.com/rss/search?q=%22Sri+Lanka%22+best+places+OR+destinations+when:30d&hl=en&gl=US&ceid=US:en",
             "https://news.google.com/rss/search?q=%22Sri+Lanka%22+new+destination+OR+attraction+OR+resort+when:30d&hl=en-LK&gl=LK&ceid=LK:en",
@@ -85,6 +89,8 @@ DOMAINS = [
     {
         "slug": "world-animals",
         "site": "a global animal and wildlife news blog",
+        "category": "Wildlife",
+        "tags": ["wildlife", "animals", "conservation"],
         "feeds": [
             "https://news.google.com/rss/search?q=wildlife+conservation+when:7d&hl=en&gl=US&ceid=US:en",
             "https://news.google.com/rss/search?q=endangered+species+when:7d&hl=en&gl=US&ceid=US:en",
