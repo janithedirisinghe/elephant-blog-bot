@@ -1,0 +1,19 @@
+# Secrets — never commit real API keys (.env.example stays tracked as the template)
+.env
+
+# Virtual environment
+venv/
+.venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Generated drafts (remove this line if you want drafts under version control)
+output/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,5 @@
+crewai>=0.86
+litellm
+feedparser
+python-dotenv
+truststore
