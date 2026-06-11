@@ -35,6 +35,7 @@ _llm_cache.mark_cache_breakpoint = lambda message: dict(message)
 from domains import DOMAINS
 from news import fetch_news
 from publish import send_draft
+from dedup import fetch_existing_articles, filter_new_items
 
 load_dotenv()
 
@@ -162,9 +163,21 @@ def run_domain(domain: dict) -> Path | None:
     excluded = domain.get("title_exclude")
     if excluded:
         items = [it for it in items if not any(k in it["title"].lower() for k in excluded)]
-    items = items[:12]
     if not items:
         print(f"No news found for {domain['slug']} -- check its feeds in domains.py.")
+        return None
+
+    # Drop stories already covered by a published article (public endpoints only).
+    existing = fetch_existing_articles(domain)
+    if existing:
+        before = len(items)
+        items, covered = filter_new_items(items, existing)
+        for headline, art_title in covered:
+            print(f"  skip (already published): {headline[:55]}  ~  {art_title[:45]}")
+        print(f"Dedup: {before} -> {len(items)} new ({len(existing)} published articles checked)")
+    items = items[:12]
+    if not items:
+        print(f"No NEW stories for {domain['slug']} -- all recent stories are already covered. Skipping.")
         return None
 
     digest = "\n\n".join(
@@ -188,7 +201,16 @@ def run_domain(domain: dict) -> Path | None:
     return fname
 
 
+def bot_enabled() -> bool:
+    """Kill switch: set BOT_ENABLED=false (or 0/no/off) to disable the bot."""
+    return os.getenv("BOT_ENABLED", "true").strip().lower() not in {"false", "0", "no", "off"}
+
+
 def main():
+    if not bot_enabled():
+        print("Bot is disabled (BOT_ENABLED is off). Nothing to do.")
+        return
+
     # Optional args select domains by slug, e.g.:  python crew.py tourism world-animals
     slugs = sys.argv[1:]
     known = {d["slug"] for d in DOMAINS}
